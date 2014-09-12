@@ -29,6 +29,7 @@ class UeditorHandlerController {
 
     def beforeInterceptor = {
         println "Tracing action ${actionUri}"
+        println ueditorConfigService.getUploadFolder('image')
     }
 
     def index() {
@@ -42,6 +43,7 @@ class UeditorHandlerController {
         up.setMaxSize(10000); //单位KB
         up.upload();
         response.getWriter().print("{'original':'"+up.getOriginalName()+"','url':'"+up.getUrl()+"','title':'"+up.getTitle()+"','state':'"+up.getState()+"'}");
+        println("{'original':'"+up.getOriginalName()+"','url':'"+up.getUrl()+"','title':'"+up.getTitle()+"','state':'"+up.getState()+"'}");
     }
 
     def wordImageUp() {

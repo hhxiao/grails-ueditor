@@ -38,7 +38,7 @@ class Ueditor {
 <script type="text/javascript" src="${ueditorHome}ueditor.config.js"></script>
 <script type="text/javascript" src="${ueditorHome}ueditor.all${minified ? '.min' : ''}.js"></script>
 <script type="text/javascript">
-alert(window.UEDITOR_CONFIG.imageUrl);
+//alert(window.UEDITOR_CONFIG.imageUrl);
 </script>
 """
     }

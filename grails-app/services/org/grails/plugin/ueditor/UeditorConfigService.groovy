@@ -18,32 +18,38 @@ package org.grails.plugin.ueditor
 
 import org.springframework.beans.factory.InitializingBean
 
-class UeditorConfigService {
+class UeditorConfigService implements InitializingBean {
+    def uploadFolders = [:]
     def grailsApplication
 
-    boolean isUploadEnabled(String type) {
-        def path = grailsApplication.config.ueditor?.uploader?."${type}"?.path?.toString()
-        return path ? true : false
-    }
-
     String getUploadFolder(String type) {
-        return grailsApplication.config.ueditor?.uploader?."${type}"?.path?.toString()
+        uploadFolders.get(type)
     }
 
     def getUrlHandlers(def g, def request) throws Exception {
         def urlConfigurations = [:]
 
-        ['image':'imageUp', 'scrawl':'scrawlUp', 'file':'fileUp',
-                'catcher':'getRemoteImage', 'imageManager':'imageManager',
-                'wordImage':'wordImageUp'].each { type, action ->
-            boolean enabled = isUploadEnabled(type)
-            if(enabled) {
-                def url = g.createLink(controller: 'ueditorUrlHandler', action: action)
-                def path = g.createLink(controller: 'ueditorUrlHandler', action: 'index')
-                urlConfigurations.put("${type}Url".toString(), "\"${url}\"".toString())
-                urlConfigurations.put("${type}Path".toString(), "\"${path}\"".toString())
-            }
+        typeActionMap.each { type, action ->
+            def url = g.createLink(controller: 'ueditorUrlHandler', action: action)
+            def path = g.createLink(controller: 'ueditorUrlHandler', action: 'index')
+            urlConfigurations.put("${type}Url".toString(), "\"${url}\"".toString())
+            urlConfigurations.put("${type}Path".toString(), "\"${path}\"".toString())
         }
         return urlConfigurations
     }
+
+    @Override
+    void afterPropertiesSet() throws Exception {
+        typeActionMap.each { type, action ->
+            def path = grailsApplication.config.ueditor?.uploader?."${type}"?.path
+            if(!path) path = "upload/${type}"
+            File folder = new File(path.toString())
+            folder.mkdirs()
+            uploadFolders.put(type, folder.absolutePath)
+        }
+    }
+
+    static def typeActionMap = ['image':'imageUp', 'scrawl':'scrawlUp', 'file':'fileUp',
+            'catcher':'getRemoteImage', 'imageManager':'imageManager',
+            'wordImage':'wordImageUp']
 }
