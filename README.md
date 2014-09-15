@@ -20,8 +20,8 @@ compile ":ueditor:1.4.3"
 Include required resources in page header
 
 ~~~~~~~~~~~
-    <r:require module="jquery"/>
-    <ueditor:resources/>
+<r:require module="jquery"/>
+<ueditor:resources/>
 ~~~~~~~~~~~
 
 Declare editor in form
