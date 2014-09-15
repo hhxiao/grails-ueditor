@@ -20,39 +20,47 @@ class Ueditor {
     def config
     def basePath
     def version
+    def lang
     def urlHandlers
 
-    Ueditor(grailsApplication, String basePath, String version) {
+    Ueditor(def grailsApplication, String basePath, String version) {
+        this(grailsApplication, basePath, version, '')
+    }
+
+    Ueditor(def grailsApplication, String basePath, String version, String lang) {
         this.config = new UeditorConfig(grailsApplication)
         this.basePath = basePath
         this.version = version
+        this.lang = lang ?: 'en'
     }
 
     def renderResources(g, minified) {
-        def ueditorHome = "${basePath}/ueditor-${version}/"
-        return """<script type="text/javascript">
-    window.UEDITOR_HOME_URL = "${ueditorHome}";
-    window.UEDITOR_UPLOAD_URL = "${g.createLink(controller: 'ueditorHandler', action: '')}";
-    window.UEDITOR = {config:{default:{}},instance:{}};
-</script>
-<script type="text/javascript" src="${ueditorHome}ueditor.config.js"></script>
-<script type="text/javascript" src="${ueditorHome}ueditor.all${minified ? '.min' : ''}.js"></script>
-<script type="text/javascript">
-//alert(window.UEDITOR_CONFIG.imageUrl);
-</script>
+        def ueditorHome = "${basePath}/ueditor-${version}"
+        return """
+    <script type="text/javascript">
+        window.UEDITOR_HOME_URL = "${ueditorHome}/";
+        window.UEDITOR = {config:{default:{}},instance:{}};
+    </script>
+    <script type="text/javascript" src="${ueditorHome}/ueditor.config.js"></script>
+    <script type="text/javascript" src="${ueditorHome}/ueditor.all${minified ? '.min' : ''}.js"></script>
+    <script type="text/javascript" src="${ueditorHome}/lang/${lang}/${lang}.js"></script>
+    <script type="text/javascript">
+        window.UEDITOR_CONFIG.serverUrl = "${g.createLink(controller: 'ueditorHandler', action: 'handle')}";
+    </script>
 """
     }
 
-    def renderEditor(String instanceId, String instanceName, String initialValue) {
+    def renderEditor(String instanceId, String initialValue, def attrs) {
         StringBuilder buf = new StringBuilder()
         if (this.config.append) {
-            buf << """<textarea id="${instanceId}" name="${instanceName}">${initialValue?.encodeAsHTML()}</textarea>\n"""
+            buf << """
+    <textarea id="${instanceId}" ${attrs.collect {it.key + '="' + it.value + '"'}.join(' ')}>${initialValue?.encodeAsHTML()}</textarea>"""
         }
-        buf << """<script type="text/javascript">
-    var ${instanceId}Cfg = UEDITOR.config.${instanceId} || UEDITOR.config.default;
-    UEDITOR.instance.${instanceId} = new UE.ui.Editor(${instanceId}Cfg);
-    UEDITOR.instance.${instanceId}.render("${instanceId}");
-</script>\n"""
+        buf << """
+    <script type="text/javascript">
+        UEDITOR.instance.${instanceId} = new UE.ui.Editor(UEDITOR.config.${instanceId} || UEDITOR.config.default);
+        UEDITOR.instance.${instanceId}.render("${instanceId}");
+    </script>"""
         return buf.toString()
     }
 }

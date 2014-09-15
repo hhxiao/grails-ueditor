@@ -1,19 +1,11 @@
-class UrlMappings {
+class UeditorUrlMappings {
 
 	static mappings = {
-        "/ueditor/"(controller: "ueditorHandler", action: 'index') {
+        "/ueditorHandler/file/$type/$path**?"(controller: "ueditorHandler") {
+            action = [GET: 'download']
         }
 
-        "/ueditor/$action"(controller: "ueditorHandler") {
+        "/ueditorHandler/$action"(controller: "ueditorHandler") {
         }
-
-		"/$controller/$action?/$id?"{
-			constraints {
-				// apply constraints here
-			}
-		}
-
-		"/"(view:"/index")
-		"500"(view:'/error')
 	}
 }

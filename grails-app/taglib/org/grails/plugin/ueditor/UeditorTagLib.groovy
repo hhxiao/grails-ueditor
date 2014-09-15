@@ -26,12 +26,12 @@ class UeditorTagLib {
     def ueditorConfigService
 
     def resources = { attrs ->
-        def minified = true
-        if (Environment.current != Environment.PRODUCTION) {
+        def minified = false
+        if (Environment.current == Environment.PRODUCTION) {
             minified = attrs?.minified ? attrs?.minified == 'true' : true
         }
         attrs.remove('minified')
-        def editor = new Ueditor(grailsApplication, getPluginResourcePath(request), getPluginVersion())
+        def editor = new Ueditor(grailsApplication, getPluginResourcePath(request), getPluginVersion(), attrs.remove('lang'))
         out << editor.renderResources(g, minified)
     }
  
@@ -55,10 +55,9 @@ class UeditorTagLib {
     def editor = { attrs, body ->
         if (!attrs.id) throwTagError("Tag [editor] is missing required attribute [id]")
         String id = attrs.id
-        String name = attrs.name ?: attrs.id
         String value = attrs.value ?: body()
         def editor = new Ueditor(grailsApplication, getPluginResourcePath(request), getPluginVersion())
-        out << editor.renderEditor(id, name, value)
+        out << editor.renderEditor(id, value, attrs)
     }
 
     private String getPluginResourcePath(def request) {

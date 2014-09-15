@@ -16,40 +16,36 @@
 
 package org.grails.plugin.ueditor
 
+import grails.converters.JSON
+import org.codehaus.groovy.grails.web.json.JSONObject
 import org.springframework.beans.factory.InitializingBean
+import org.springframework.core.io.ClassPathResource
 
 class UeditorConfigService implements InitializingBean {
-    def uploadFolders = [:]
     def grailsApplication
+    String serverUrl
+    JSONObject config
 
     String getUploadFolder(String type) {
-        uploadFolders.get(type)
+        type
     }
 
-    def getUrlHandlers(def g, def request) throws Exception {
-        def urlConfigurations = [:]
-
-        typeActionMap.each { type, action ->
-            def url = g.createLink(controller: 'ueditorUrlHandler', action: action)
-            def path = g.createLink(controller: 'ueditorUrlHandler', action: 'index')
-            urlConfigurations.put("${type}Url".toString(), "\"${url}\"".toString())
-            urlConfigurations.put("${type}Path".toString(), "\"${path}\"".toString())
-        }
-        return urlConfigurations
+    String getUrlPrefix(String type) {
+        "${serverUrl}/ueditorHandler/file/${type}/"
     }
 
     @Override
     void afterPropertiesSet() throws Exception {
-        typeActionMap.each { type, action ->
-            def path = grailsApplication.config.ueditor?.uploader?."${type}"?.path
-            if(!path) path = "upload/${type}"
-            File folder = new File(path.toString())
-            folder.mkdirs()
-            uploadFolders.put(type, folder.absolutePath)
+        serverUrl = grailsApplication.config.grails.serverURL.toString()
+
+        def text = new ClassPathResource('/config.json').inputStream.text
+        config = JSON.parse(text)
+        config.entrySet().each {
+            String key = it.key
+            if(key.endsWith('UrlPrefix')) {
+                String type = key.substring(0, key.indexOf('UrlPrefix'))
+                config.put(key, getUrlPrefix(type))
+            }
         }
     }
-
-    static def typeActionMap = ['image':'imageUp', 'scrawl':'scrawlUp', 'file':'fileUp',
-            'catcher':'getRemoteImage', 'imageManager':'imageManager',
-            'wordImage':'wordImageUp']
 }

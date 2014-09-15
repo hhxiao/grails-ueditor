@@ -1,6 +1,6 @@
 class UeditorGrailsPlugin {
     // the plugin version
-    def version = "1.2.6.0"
+    def version = "1.4.3"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "2.0 > *"
     // the other plugins this plugin depends on
