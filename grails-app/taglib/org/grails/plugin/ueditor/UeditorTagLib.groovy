@@ -41,8 +41,21 @@ class UeditorTagLib {
         def var = attrs.remove('var')
         try {
             if (var) {
-                def value = body()
-                cfg.addConfigItem(var, value)
+                if(var == 'toolbars') {
+                    def type = attrs.value
+                    def buttonDef
+                    if(type) {
+                        buttonDef = g.message(code: "ueditor.toolbar.${type}", default: "source | undo redo | bold italic underline strikethrough | forecolor backcolor | fontsize")
+                    } else {
+                        buttonDef = body()
+                    }
+                    // convert 2 dim array
+                    def value = buttonDef.split(',').collect{it.split(' ').collect{"'${it.trim()}'"}}
+                    cfg.addConfigItem(var, value)
+                } else {
+                    def value = attrs.value ?: body()
+                    cfg.addConfigItem(var, value)
+                }
             } else {
                 cfg.addConfigItems(attrs)
             }

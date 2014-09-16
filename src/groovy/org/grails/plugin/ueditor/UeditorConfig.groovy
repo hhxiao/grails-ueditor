@@ -18,7 +18,6 @@ package org.grails.plugin.ueditor
 
 class UeditorConfig {
     static final PLUGIN_NAME = "ueditor"
-    static final DEFAULT_BASEDIR = "/uploads/"
 
     def grailsApplication
     def skipAllowedItemsCheck
@@ -35,11 +34,14 @@ class UeditorConfig {
 
     def addConfigItems(attrs) {
         attrs?.each { key, value ->
-            this.config[key] = value
+            addConfigItem(key, value)
         }
     }
 
     def addConfigItem(key, value) {
+        if(!skipAllowedItemsCheck && !ALLOWED_CONFIG_ITEMS.contains(key)) {
+            throw new IllegalArgumentException("Invalid config item: $key")
+        }
         this.config[key] = value
     }
 
@@ -149,6 +151,7 @@ class UeditorConfig {
             'sourceEditorFirst',
             'iframeUrlMap',
             'webAppKey',
-            'allowDivTransToP'
+            'allowDivTransToP',
+            'toolbars'
     ]
 }
