@@ -13,7 +13,19 @@ compile ":ueditor:1.4.3"
 
 ## Configuration
 
+Configure toolbar buttions, use predefined toolbar types: mini, compcat, default, full.
 
+~~~~~~~~~~~
+<ueditor:config var="toolbars" value="compact"/>
+~~~~~~~~~~~
+
+Or customize it, 
+
+~~~~~~~~~~~
+<ueditor:config var="toolbars">
+    fullscreen source | undo redo | bold italic underline fontborder strikethrough superscript subscript blockquote pasteplain | forecolor backcolor insertorderedlist insertunorderedlist
+</umeditor:toolbar>
+~~~~~~~~~~~
 
 ## Usage
 
