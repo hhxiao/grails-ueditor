@@ -19,27 +19,35 @@ package org.grails.plugin.ueditor
 class Ueditor {
     def config
     def homePath
-    def urlHandlers
 
     Ueditor(def grailsApplication, String homePath) {
         this.config = new UeditorConfig(grailsApplication)
         this.homePath = homePath
     }
 
-    def renderResources(g, minified, String lang) {
+    def renderResources(g, minified, String lang, String customConfigJs) {
         lang = lang ?: 'en'
         return """
     <script type="text/javascript">
         window.UEDITOR_HOME_URL = "${homePath}/";
         window.UEDITOR = {config:{default:{}},instance:{}};
     </script>
-    <script type="text/javascript" src="${homePath}/ueditor.config.js"></script>
+    <script type="text/javascript" src="${homePath}/ueditor.config.js"></script>${customConfig(customConfigJs)}
     <script type="text/javascript" src="${homePath}/ueditor.all${minified ? '.min' : ''}.js"></script>
     <script type="text/javascript" src="${homePath}/lang/${lang}/${lang}.js"></script>
     <script type="text/javascript">
         window.UEDITOR_CONFIG.serverUrl = "${g.createLink(controller: 'ueditorHandler', action: 'handle')}";
     </script>
 """
+    }
+
+    private String customConfig(customConfigJs) {
+        if(customConfigJs) {
+            """
+    <script type="text/javascript" src="${customConfigJs}"></script>"""
+        } else {
+            ''
+        }
     }
 
     def renderEditor(String instanceId, String initialValue, def attrs) {

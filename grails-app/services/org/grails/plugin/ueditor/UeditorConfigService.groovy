@@ -47,6 +47,10 @@ class UeditorConfigService implements InitializingBean {
         }
     }
 
+    String getCustomConfig() {
+        userConfig.config ? userConfig.config.toString() : ''
+    }
+
     String getUrlPrefix(String type) {
         def baseUrl = userConfig.upload.baseUrl
         if(type.endsWith('Manager')) type = type.substring(0, type.length() - 7)
@@ -70,7 +74,7 @@ class UeditorConfigService implements InitializingBean {
     }
 
     Ueditor newEditor(def request) {
-        new Ueditor(grailsApplication, "${request.contextPath}/${ueditorResourcePath}")
+        new Ueditor(grailsApplication, "${request.contextPath}${ueditorResourcePath}")
     }
 
     String getUeditorResourcePath() {
@@ -90,7 +94,7 @@ class UeditorConfigService implements InitializingBean {
 
         contextPath = grailsApplication.mainContext.servletContext.contextPath
 
-        userConfig = grailsApplication.config.grails.ueditor.config
+        userConfig = grailsApplication.config.ueditor
 
         config = (JSONObject)JSON.parse(new ClassPathResource('/UeditorConfig.json').inputStream, StandardCharsets.UTF_8.name())
         config.entrySet().each {
@@ -100,5 +104,8 @@ class UeditorConfigService implements InitializingBean {
                 config.put(key, getUrlPrefix(type))
             }
         }
+        println getCustomConfig()
+        println userConfig.upload.baseUrl
+        println userConfig.upload._baseUrl
     }
 }

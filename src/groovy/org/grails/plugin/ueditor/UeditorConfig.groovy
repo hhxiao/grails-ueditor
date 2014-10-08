@@ -48,8 +48,6 @@ class UeditorConfig {
     String getConfiguration() {
         def configs = []
 
-        def uconfig = grailsApplication.config.ueditor?.config
-        if(uconfig) configs.add(uconfig)
         this.config.each {k, v ->
             if(v != null) configs << "${k}: ${v instanceof String ? "\"$v\"" : v}"
         }
