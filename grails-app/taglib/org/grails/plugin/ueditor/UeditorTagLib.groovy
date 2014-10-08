@@ -32,7 +32,7 @@ class UeditorTagLib {
         def editor = ueditorConfigService.newEditor(request)
         String lang = attrs.lang ?: ueditorConfigService.resolveLang(request)
         def customerConfigJs = ueditorConfigService.customConfig
-        out << editor.renderResources(g, minified, lang, customerConfigJs ? "${request.contextPath}${customerConfigJs}" : "")
+        out << editor.renderResources(g, minified, lang, customerConfigJs ? "${request.contextPath}${customerConfigJs}" : "", attrs.userSpace)
     }
  
     def config = { attrs, body ->

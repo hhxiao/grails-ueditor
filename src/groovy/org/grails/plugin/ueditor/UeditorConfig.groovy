@@ -25,20 +25,20 @@ class UeditorConfig {
 
     def config = [:]
 
-    UeditorConfig(grailsApplication) {
+    UeditorConfig(def grailsApplication) {
         this.grailsApplication = grailsApplication
         def cfg = grailsApplication.config
         this.skipAllowedItemsCheck = cfg.editor?.skipAllowedItemsCheck ?: false
         this.append = cfg.editor?.append ?: true
     }
 
-    def addConfigItems(attrs) {
+    def addConfigItems(def attrs) {
         attrs?.each { key, value ->
             addConfigItem(key, value)
         }
     }
 
-    def addConfigItem(key, value) {
+    def addConfigItem(def key, def value) {
         if(!skipAllowedItemsCheck && !ALLOWED_CONFIG_ITEMS.contains(key)) {
             throw new IllegalArgumentException("Invalid config item: $key")
         }

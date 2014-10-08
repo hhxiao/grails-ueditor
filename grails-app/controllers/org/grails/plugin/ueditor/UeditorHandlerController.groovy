@@ -29,16 +29,16 @@ class UeditorHandlerController {
         response.sendError(HttpURLConnection.HTTP_OK)
     }
 
-    def handle() {
+    def handle(String userSpace) {
         def action = request.getParameter('action')
         if('config' == action) {
             forward(action: 'config')
         } else if(action.startsWith('upload')) {
             String type = action.substring(6)
-            forward(action: 'upload', params: [xtype: type])
+            forward(action: 'upload', params: [xtype: type, userSpace: userSpace])
         } else if(action.startsWith('list')) {
             String type = action.substring(4)
-            forward(action: 'list', params: [xtype: type])
+            forward(action: 'list', params: [xtype: type, userSpace: userSpace])
         } else {
             response.sendError(HttpURLConnection.HTTP_NOT_FOUND)
         }
@@ -61,7 +61,7 @@ class UeditorHandlerController {
         }
     }
 
-    def upload(String xtype) {
+    def upload(String xtype, String userSpace) {
         Uploader up = new Uploader()
         up.setSavePath(ueditorConfigService.getUploadFolder(xtype))
         up.upload(request)
@@ -81,7 +81,7 @@ class UeditorHandlerController {
         }
     }
 
-    def list(String xtype, int start, String userSpace, Integer count) {
+    def list(String xtype, String userSpace, int start, Integer count) {
         Uploader up = new Uploader();
         up.setSavePath(ueditorConfigService.getUploadFolder(xtype))
         String rootPath = up.getPhysicalPath(request, '')
@@ -92,7 +92,7 @@ class UeditorHandlerController {
             count: count ?: 20,
             allowFiles: ueditorConfigService.config."${xtype}ManagerAllowFiles" as String[]
         ]
-
+        println conf
         FileManager fm = new FileManager( conf )
         render( text: fm.listFile(start).toJSONString(), contentType: "application/json", encoding: "UTF-8" )
     }

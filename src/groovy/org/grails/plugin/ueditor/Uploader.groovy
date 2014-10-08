@@ -42,7 +42,7 @@ class Uploader {
         try {
             MultipartFile file = (MultipartFile)request.getFile('upfile')
             this.originalName = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf(System.getProperty("file.separator")) + 1)
-            this.fileName = this.getName(this.originalName)
+            this.fileName = this.getName(this.originalName.toLowerCase(), request.getParameter('userSpace'))
             this.type = this.getFileExt(this.fileName)
             if (!this.checkFileType(type)) {
                 this.state = TYPE
@@ -89,9 +89,13 @@ class Uploader {
      * 依据原始文件名生成新文件名
      * @return
      */
-    private String getName(String fileName) {
-        Random random = new Random()
-        return this.fileName = Integer.toHexString(random.nextInt(256)) + '/' + System.currentTimeMillis() + "_" + fileName
+    private String getName(String fileName, String userSpace) {
+        if(userSpace) {
+            return this.fileName = userSpace + '/' + System.currentTimeMillis() + "_" + fileName
+        } else {
+            Random random = new Random()
+            return this.fileName = Integer.toHexString(random.nextInt(256)) + '/' + System.currentTimeMillis() + "_" + fileName
+        }
     }
 
     /**

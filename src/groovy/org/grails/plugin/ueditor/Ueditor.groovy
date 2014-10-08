@@ -25,7 +25,7 @@ class Ueditor {
         this.homePath = homePath
     }
 
-    def renderResources(g, minified, String lang, String customConfigJs) {
+    def renderResources(g, minified, String lang, String customConfigJs, String userSpace) {
         lang = lang ?: 'en'
         return """
     <script type="text/javascript">
@@ -36,7 +36,7 @@ class Ueditor {
     <script type="text/javascript" src="${homePath}/ueditor.all${minified ? '.min' : ''}.js"></script>
     <script type="text/javascript" src="${homePath}/lang/${lang}/${lang}.js"></script>
     <script type="text/javascript">
-        window.UEDITOR_CONFIG.serverUrl = "${g.createLink(controller: 'ueditorHandler', action: 'handle')}";
+        window.UEDITOR_CONFIG.serverUrl = "${g.createLink(controller: 'ueditorHandler', action: 'handle', params: [userSpace: userSpace?:''])}";
     </script>
 """
     }

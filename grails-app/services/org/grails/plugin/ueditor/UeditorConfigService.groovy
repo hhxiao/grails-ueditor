@@ -104,8 +104,5 @@ class UeditorConfigService implements InitializingBean {
                 config.put(key, getUrlPrefix(type))
             }
         }
-        println getCustomConfig()
-        println userConfig.upload.baseUrl
-        println userConfig.upload._baseUrl
     }
 }
