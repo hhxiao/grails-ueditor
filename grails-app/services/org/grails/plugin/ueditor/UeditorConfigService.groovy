@@ -38,7 +38,7 @@ class UeditorConfigService implements InitializingBean {
     void afterPropertiesSet() throws Exception {
         serverUrl = grailsApplication.config.grails.serverURL.toString()
 
-        def text = new ClassPathResource('/config.json').inputStream.text
+        def text = new ClassPathResource('/UeditorConfig.json').inputStream.text
         config = JSON.parse(text)
         config.entrySet().each {
             String key = it.key
