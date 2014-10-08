@@ -23,7 +23,6 @@ class UeditorTagLib {
 
     def grailsApplication
     def pluginManager
-    def ueditorConfigService
 
     def resources = { attrs ->
         def minified = false
@@ -66,11 +65,12 @@ class UeditorTagLib {
     }
 
     def editor = { attrs, body ->
-        if (!attrs.id) throwTagError("Tag [editor] is missing required attribute [id]")
-        String id = attrs.id
+        if (!attrs.id && !attrs.name) throwTagError("Tag [editor] is missing required attribute [id|name]")
         String value = attrs.value ?: body()
         def editor = new Ueditor(grailsApplication, getPluginResourcePath(request), getPluginVersion())
-        out << editor.renderEditor(id, value, attrs)
+        String id = attrs.remove('id')
+        if(!id) id = attrs.name
+        out << editor.renderEditor(id, attrs.remove('name'), value, attrs)
     }
 
     private String getPluginResourcePath(def request) {
