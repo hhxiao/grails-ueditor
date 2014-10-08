@@ -16,9 +16,8 @@
 
 package org.grails.plugin.ueditor
 
+import com.baidu.ueditor.hunter.FileManager
 import grails.converters.JSON
-import org.codehaus.groovy.grails.web.json.JSONObject
-import org.springframework.core.io.ClassPathResource
 
 class UeditorHandlerController {
     static String[] IMAGE_FILE_TYPES = [".gif" , ".png" , ".jpg" , ".jpeg" , ".bmp"] as String[];
@@ -50,8 +49,8 @@ class UeditorHandlerController {
     }
 
     def download(String type, String path) {
-        Uploader up = new Uploader();
-        up.setSavePath(ueditorConfigService.getUploadFolder(type));
+        Uploader up = new Uploader()
+        up.setSavePath(ueditorConfigService.getUploadFolder(type))
 
         File file = new File(up.getPhysicalPath(request, path))
         if(file.file && file.exists()) {
@@ -63,9 +62,9 @@ class UeditorHandlerController {
     }
 
     def upload(String xtype) {
-        Uploader up = new Uploader();
-        up.setSavePath(ueditorConfigService.getUploadFolder(xtype));
-        up.upload(request);
+        Uploader up = new Uploader()
+        up.setSavePath(ueditorConfigService.getUploadFolder(xtype))
+        up.upload(request)
 
         String callback = request.getParameter("callback");
 
@@ -76,13 +75,25 @@ class UeditorHandlerController {
         result = result.replaceAll( "\\\\", "\\\\" );
 
         if( callback == null ){
-            render ( result );
+            render ( result )
         } else{
-            render ("<script>"+ callback +"(" + result + ")</script>");
+            render ("<script>"+ callback +"(" + result + ")</script>")
         }
     }
 
-    def list(String xtype) {
-        response.sendError(HttpURLConnection.HTTP_OK)
+    def list(String xtype, int start, String userSpace, Integer count) {
+        Uploader up = new Uploader();
+        up.setSavePath(ueditorConfigService.getUploadFolder(xtype))
+        String rootPath = up.getPhysicalPath(request, '')
+
+        Map conf = [
+            rootPath: rootPath,
+            dir: userSpace ?: '',
+            count: count ?: 20,
+            allowFiles: ueditorConfigService.config."${xtype}ManagerAllowFiles" as String[]
+        ]
+
+        FileManager fm = new FileManager( conf )
+        render( text: fm.listFile(start).toJSONString(), contentType: "application/json", encoding: "UTF-8" )
     }
 }

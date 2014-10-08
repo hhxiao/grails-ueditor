@@ -15,7 +15,6 @@
  */
 
 package org.grails.plugin.ueditor
-
 import grails.converters.JSON
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.springframework.beans.factory.InitializingBean
@@ -23,27 +22,39 @@ import org.springframework.core.io.ClassPathResource
 import org.springframework.web.context.support.ServletContextResource
 
 import javax.servlet.http.HttpServletRequest
+import java.nio.charset.StandardCharsets
 import java.util.concurrent.ConcurrentHashMap
 
 class UeditorConfigService implements InitializingBean {
     def grailsApplication
     def pluginManager
 
-    String serverUrl
+    String contextPath
     JSONObject config
-    ConfigObject pluginConfig
 
     private Map<String, String> supportedLang = new ConcurrentHashMap<>()
 
-    private pluginVersion
-    private ueditorVersion
+    private String pluginVersion
+    private String ueditorVersion
+    private def userConfig
 
     String getUploadFolder(String type) {
-        type
+        def baseDir = userConfig.upload.baseDir
+        if(baseDir) {
+            "${baseDir}/${type}"
+        } else {
+            type
+        }
     }
 
     String getUrlPrefix(String type) {
-        "${serverUrl}/ueditorHandler/file/${type}/"
+        def baseUrl = userConfig.upload.baseUrl
+        if(type.endsWith('Manager')) type = type.substring(0, type.length() - 7)
+        if(baseUrl) {
+            "${baseUrl}/${type}/"
+        } else {
+            "${contextPath}/ueditorHandler/file/${type}/"
+        }
     }
 
     String resolveLang(HttpServletRequest request) {
@@ -63,7 +74,7 @@ class UeditorConfigService implements InitializingBean {
     }
 
     String getUeditorResourcePath() {
-        return "/plugins/${UeditorConfig.PLUGIN_NAME.toLowerCase()}-$pluginVersion/${UeditorConfig.PLUGIN_NAME.toLowerCase()}-$ueditorVersion"
+        return "/plugins/${UeditorConfig.PLUGIN_NAME}-$pluginVersion/${UeditorConfig.PLUGIN_NAME}-$ueditorVersion"
     }
 
     @Override
@@ -77,8 +88,11 @@ class UeditorConfigService implements InitializingBean {
             ueditorVersion = pluginVersion
         }
 
-        serverUrl = grailsApplication.config.grails.serverURL.toString()
-        config = (JSONObject)JSON.parse(new ClassPathResource('/UeditorConfig.json').inputStream.text)
+        contextPath = grailsApplication.mainContext.servletContext.contextPath
+
+        userConfig = grailsApplication.config.grails.ueditor.config
+
+        config = (JSONObject)JSON.parse(new ClassPathResource('/UeditorConfig.json').inputStream, StandardCharsets.UTF_8.name())
         config.entrySet().each {
             String key = it.key
             if(key.endsWith('UrlPrefix')) {
@@ -86,6 +100,5 @@ class UeditorConfigService implements InitializingBean {
                 config.put(key, getUrlPrefix(type))
             }
         }
-        pluginConfig = grailsApplication.config.grails.ueditor.config
     }
 }

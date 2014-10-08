@@ -13,17 +13,17 @@ import static org.grails.plugin.ueditor.ErrorCode.*
  */
 class Uploader {
     // 输出文件地址
-    String url = "";
+    String url = ""
     // 上传文件名
-    String fileName = "";
+    String fileName = ""
     // 状态
-    ErrorCode state;
+    ErrorCode state
     // 文件类型
-    String type = "";
+    String type = ""
     // 原始文件名
-    String originalName = "";
+    String originalName = ""
     // 文件大小
-    long size = 0;
+    long size = 0
 
     // 保存路径
     String savePath = "images"
@@ -34,26 +34,26 @@ class Uploader {
     int maxSize = 10000;
 
     public void upload(def request) throws Exception {
-        boolean isMultipart = ServletFileUpload.isMultipartContent(request);
+        boolean isMultipart = ServletFileUpload.isMultipartContent(request)
         if (!isMultipart) {
             this.state = NOFILE
-            return;
+            return
         }
         try {
             MultipartFile file = (MultipartFile)request.getFile('upfile')
-            this.originalName = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf(System.getProperty("file.separator")) + 1);
-            this.fileName = this.getName(this.originalName);
-            this.type = this.getFileExt(this.fileName);
+            this.originalName = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf(System.getProperty("file.separator")) + 1)
+            this.fileName = this.getName(this.originalName)
+            this.type = this.getFileExt(this.fileName)
             if (!this.checkFileType(type)) {
                 this.state = TYPE
-                return;
+                return
             }
             this.url = this.fileName;
-            File ofile = new File(this.getPhysicalPath(request, this.url));
+            File ofile = new File(this.getPhysicalPath(request, this.url))
             ofile.getParentFile().mkdirs()
             file.transferTo(ofile)
             this.state = SUCCESS
-            this.size = file.size;
+            this.size = file.size
         } catch (FileUploadBase.SizeLimitExceededException e) {
             this.state = SIZE
         } catch (FileUploadBase.InvalidContentTypeException e) {
@@ -72,7 +72,7 @@ class Uploader {
      * @return
      */
     private boolean checkFileType(String type) {
-        return this.allowFiles.length == 0 || this.allowFiles.contains(type.toLowerCase());
+        return this.allowFiles.length == 0 || this.allowFiles.contains(type.toLowerCase())
     }
 
     /**
@@ -90,8 +90,8 @@ class Uploader {
      * @return
      */
     private String getName(String fileName) {
-        Random random = new Random();
-        return this.fileName = Integer.toHexString(random.nextInt(256)) + "/" + System.currentTimeMillis() + "_" + fileName;
+        Random random = new Random()
+        return this.fileName = Integer.toHexString(random.nextInt(256)) + '/' + System.currentTimeMillis() + "_" + fileName
     }
 
     /**
@@ -101,9 +101,21 @@ class Uploader {
      * @return
      */
     public String getPhysicalPath(def request, String path) {
-        String servletPath = request.getServletPath();
-        String realPath = request.getSession().getServletContext()
-                .getRealPath(servletPath);
-        return new File(realPath).getParent() + "/" + savePath + "/" + path;
+        File savePathFile = new File(savePath)
+        if(savePathFile.isAbsolute()) {
+            if(path.startsWith(File.separator)) {
+                return savePath + path
+            } else {
+                return savePath + File.separator + path
+            }
+        } else {
+            String servletPath = request.getServletPath();
+            String realPath = request.getSession().getServletContext().getRealPath(servletPath)
+            if(path.startsWith(File.separator)) {
+                return new File(realPath).getParent() + File.separator + savePath + path
+            } else {
+                return new File(realPath).getParent() + File.separator + savePath +File.separator + path
+            }
+        }
     }
 }

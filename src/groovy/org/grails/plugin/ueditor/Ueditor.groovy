@@ -42,11 +42,11 @@ class Ueditor {
 """
     }
 
-    def renderEditor(String instanceId, String instanceName, String initialValue, def attrs) {
+    def renderEditor(String instanceId, String initialValue, def attrs) {
         StringBuilder buf = new StringBuilder()
         if (this.config.append) {
             buf << """
-    <textarea ${instanceId?'id="'+instanceId+'"':''} ${instanceName?'name="'+instanceName+'"':''} ${attrs.collect {it.key + '="' + it.value + '"'}.join(' ')}>${initialValue?.encodeAsHTML()}</textarea>"""
+    <textarea id="${instanceId}" ${attrs.collect {it.key + '="' + it.value + '"'}.join(' ')}>${initialValue?.encodeAsHTML()}</textarea>"""
         }
         buf << """
     <script type="text/javascript">

@@ -29,10 +29,8 @@ class UeditorTagLib {
         if (Environment.current == Environment.PRODUCTION) {
             minified = attrs?.minified ? attrs?.minified == 'true' : true
         }
-        attrs.remove('minified')
         def editor = ueditorConfigService.newEditor(request)
-        String lang = attrs.remove('lang')
-        if(!lang) lang = ueditorConfigService.resolveLang(request)
+        String lang = attrs.lang ?: ueditorConfigService.resolveLang(request)
         out << editor.renderResources(g, minified, lang)
     }
  
@@ -72,6 +70,6 @@ class UeditorTagLib {
         def editor = ueditorConfigService.newEditor(request)
         String id = attrs.remove('id')
         if(!id) id = attrs.name
-        out << editor.renderEditor(id, attrs.remove('name'), value, attrs)
+        out << editor.renderEditor(id, value, attrs)
     }
 }
