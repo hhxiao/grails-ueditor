@@ -18,32 +18,24 @@ package org.grails.plugin.ueditor
 
 class Ueditor {
     def config
-    def basePath
-    def version
-    def lang
+    def homePath
     def urlHandlers
 
-    Ueditor(def grailsApplication, String basePath, String version) {
-        this(grailsApplication, basePath, version, '')
-    }
-
-    Ueditor(def grailsApplication, String basePath, String version, String lang) {
+    Ueditor(def grailsApplication, String homePath) {
         this.config = new UeditorConfig(grailsApplication)
-        this.basePath = basePath
-        this.version = version
-        this.lang = lang ?: 'en'
+        this.homePath = homePath
     }
 
-    def renderResources(g, minified) {
-        def ueditorHome = "${basePath}/ueditor-${version}"
+    def renderResources(g, minified, String lang) {
+        lang = lang ?: 'en'
         return """
     <script type="text/javascript">
-        window.UEDITOR_HOME_URL = "${ueditorHome}/";
+        window.UEDITOR_HOME_URL = "${homePath}/";
         window.UEDITOR = {config:{default:{}},instance:{}};
     </script>
-    <script type="text/javascript" src="${ueditorHome}/ueditor.config.js"></script>
-    <script type="text/javascript" src="${ueditorHome}/ueditor.all${minified ? '.min' : ''}.js"></script>
-    <script type="text/javascript" src="${ueditorHome}/lang/${lang}/${lang}.js"></script>
+    <script type="text/javascript" src="${homePath}/ueditor.config.js"></script>
+    <script type="text/javascript" src="${homePath}/ueditor.all${minified ? '.min' : ''}.js"></script>
+    <script type="text/javascript" src="${homePath}/lang/${lang}/${lang}.js"></script>
     <script type="text/javascript">
         window.UEDITOR_CONFIG.serverUrl = "${g.createLink(controller: 'ueditorHandler', action: 'handle')}";
     </script>

@@ -20,11 +20,23 @@ import grails.converters.JSON
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.core.io.ClassPathResource
+import org.springframework.web.context.support.ServletContextResource
+
+import javax.servlet.http.HttpServletRequest
+import java.util.concurrent.ConcurrentHashMap
 
 class UeditorConfigService implements InitializingBean {
     def grailsApplication
+    def pluginManager
+
     String serverUrl
     JSONObject config
+    ConfigObject pluginConfig
+
+    private Map<String, String> supportedLang = new ConcurrentHashMap<>()
+
+    private pluginVersion
+    private ueditorVersion
 
     String getUploadFolder(String type) {
         type
@@ -34,12 +46,39 @@ class UeditorConfigService implements InitializingBean {
         "${serverUrl}/ueditorHandler/file/${type}/"
     }
 
+    String resolveLang(HttpServletRequest request) {
+        String tag = request.locale.toLanguageTag().toLowerCase()
+        String lang = supportedLang.get(tag)
+        if(lang) return lang
+
+        String path = ueditorResourcePath + '/lang/' + tag + '/' + tag + '.js'
+        ServletContextResource scr = new ServletContextResource(request.servletContext, path)
+        lang = scr.exists() ? tag : 'en'
+        supportedLang.put(tag, lang)
+        return lang
+    }
+
+    Ueditor newEditor(def request) {
+        new Ueditor(grailsApplication, "${request.contextPath}/${ueditorResourcePath}")
+    }
+
+    String getUeditorResourcePath() {
+        return "/plugins/${UeditorConfig.PLUGIN_NAME.toLowerCase()}-$pluginVersion/${UeditorConfig.PLUGIN_NAME.toLowerCase()}-$ueditorVersion"
+    }
+
     @Override
     void afterPropertiesSet() throws Exception {
-        serverUrl = grailsApplication.config.grails.serverURL.toString()
+        pluginVersion = pluginManager.getGrailsPlugin(UeditorConfig.PLUGIN_NAME)?.version
 
-        def text = new ClassPathResource('/UeditorConfig.json').inputStream.text
-        config = JSON.parse(text)
+        // with this new version scheme, version 1.4.3_2 is a plugin patch to ueditor 1.4.3
+        if(pluginVersion.contains('_')) {
+            ueditorVersion = pluginVersion.substring(0, pluginVersion.indexOf('_'))
+        } else {
+            ueditorVersion = pluginVersion
+        }
+
+        serverUrl = grailsApplication.config.grails.serverURL.toString()
+        config = (JSONObject)JSON.parse(new ClassPathResource('/UeditorConfig.json').inputStream.text)
         config.entrySet().each {
             String key = it.key
             if(key.endsWith('UrlPrefix')) {
@@ -47,5 +86,6 @@ class UeditorConfigService implements InitializingBean {
                 config.put(key, getUrlPrefix(type))
             }
         }
+        pluginConfig = grailsApplication.config.grails.ueditor.config
     }
 }

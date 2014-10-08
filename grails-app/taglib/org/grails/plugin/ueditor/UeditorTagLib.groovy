@@ -22,7 +22,7 @@ class UeditorTagLib {
     static namespace = "ueditor"
 
     def grailsApplication
-    def pluginManager
+    def ueditorConfigService
 
     def resources = { attrs ->
         def minified = false
@@ -30,8 +30,10 @@ class UeditorTagLib {
             minified = attrs?.minified ? attrs?.minified == 'true' : true
         }
         attrs.remove('minified')
-        def editor = new Ueditor(grailsApplication, getPluginResourcePath(request), getPluginVersion(), attrs.remove('lang'))
-        out << editor.renderResources(g, minified)
+        def editor = ueditorConfigService.newEditor(request)
+        String lang = attrs.remove('lang')
+        if(!lang) lang = ueditorConfigService.resolveLang(request)
+        out << editor.renderResources(g, minified, lang)
     }
  
     def config = { attrs, body ->
@@ -67,17 +69,9 @@ class UeditorTagLib {
     def editor = { attrs, body ->
         if (!attrs.id && !attrs.name) throwTagError("Tag [editor] is missing required attribute [id|name]")
         String value = attrs.value ?: body()
-        def editor = new Ueditor(grailsApplication, getPluginResourcePath(request), getPluginVersion())
+        def editor = ueditorConfigService.newEditor(request)
         String id = attrs.remove('id')
         if(!id) id = attrs.name
         out << editor.renderEditor(id, attrs.remove('name'), value, attrs)
-    }
-
-    private String getPluginResourcePath(def request) {
-        return "${request.contextPath}/plugins/${UeditorConfig.PLUGIN_NAME.toLowerCase()}-$pluginVersion"
-    }
-
-    private String getPluginVersion() {
-        return pluginManager.getGrailsPlugin(UeditorConfig.PLUGIN_NAME)?.version
     }
 }
