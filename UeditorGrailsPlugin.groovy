@@ -18,7 +18,7 @@ UEditor web WYSIWYG editor integration plugin.
 '''
 
     // URL to the plugin's documentation
-    def documentation = "http://grails.org/plugin/grails-ueditor"
+    def documentation = "https://github.com/hhxiao/grails-ueditor"
 
     def license = "APACHE"
     def developers = []
