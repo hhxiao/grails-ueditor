@@ -33,7 +33,7 @@ class Uploader {
     // 文件大小限制，单位KB
     int maxSize = 10000;
 
-    public void upload(def request) throws Exception {
+    public void upload(def request, String userSpace) throws Exception {
         boolean isMultipart = ServletFileUpload.isMultipartContent(request)
         if (!isMultipart) {
             this.state = NOFILE
@@ -42,7 +42,7 @@ class Uploader {
         try {
             MultipartFile file = (MultipartFile)request.getFile('upfile')
             this.originalName = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf(System.getProperty("file.separator")) + 1)
-            this.fileName = this.getName(this.originalName.toLowerCase(), request.getParameter('userSpace'))
+            this.fileName = this.getName(this.originalName.toLowerCase(), userSpace)
             this.type = this.getFileExt(this.fileName)
             if (!this.checkFileType(type)) {
                 this.state = TYPE

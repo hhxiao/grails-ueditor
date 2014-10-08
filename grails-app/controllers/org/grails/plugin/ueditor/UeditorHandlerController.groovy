@@ -64,7 +64,7 @@ class UeditorHandlerController {
     def upload(String xtype, String userSpace) {
         Uploader up = new Uploader()
         up.setSavePath(ueditorConfigService.getUploadFolder(xtype))
-        up.upload(request)
+        up.upload(request, userSpace)
 
         String callback = request.getParameter("callback");
 
@@ -92,7 +92,6 @@ class UeditorHandlerController {
             count: count ?: 20,
             allowFiles: ueditorConfigService.config."${xtype}ManagerAllowFiles" as String[]
         ]
-        println conf
         FileManager fm = new FileManager( conf )
         render( text: fm.listFile(start).toJSONString(), contentType: "application/json", encoding: "UTF-8" )
     }
