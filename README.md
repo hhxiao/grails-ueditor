@@ -26,8 +26,20 @@ Or customize it,
 ~~~~~~~~~~~
 <ueditor:config var="toolbars">
     fullscreen source | undo redo | bold italic underline fontborder strikethrough superscript subscript blockquote pasteplain | forecolor backcolor insertorderedlist insertunorderedlist
-</umeditor:toolbar>
+</ueditor:toolbar>
 ~~~~~~~~~~~
+
+More configuration items in Config.groovy
+~~~~~~~~~~~
+ueditor {
+    config = '/assets/js/custom.config.js'  // Ueditor's custome config file, relative to the webapp root
+    upload = [
+        baseUrl: 'http://localhost/',  // Use another webserver to serve the file download request
+        baseDir: '/var/lib/ueditor/app' // Save to the folders relative to the baseDir instead of the default value  "grails/ueditorHandler "
+    ]
+}
+~~~~~~~~~~~
+
 
 ## Usage
 
