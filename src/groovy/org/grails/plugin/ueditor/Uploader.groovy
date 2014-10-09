@@ -1,13 +1,11 @@
 package org.grails.plugin.ueditor
-
+import com.baidu.ueditor.PathFormat
+import org.apache.commons.fileupload.FileUploadBase
+import org.apache.commons.fileupload.FileUploadException
+import org.apache.commons.fileupload.servlet.ServletFileUpload
 import org.springframework.web.multipart.MultipartFile
 
-import java.io.*;
-import java.util.*;
-import org.apache.commons.fileupload.*
-import org.apache.commons.fileupload.servlet.*
 import static org.grails.plugin.ueditor.ErrorCode.*
-
 /**
  * Created by haihxiao on 14/9/14.
  */
@@ -16,6 +14,8 @@ class Uploader {
     String url = ""
     // 上传文件名
     String fileName = ""
+    // 上传文件名
+    String pathFormat = ""
     // 状态
     ErrorCode state
     // 文件类型
@@ -93,8 +93,12 @@ class Uploader {
         if(userSpace) {
             return this.fileName = '_' + userSpace + '/' + System.currentTimeMillis() + "_" + fileName
         } else {
-            Random random = new Random()
-            return this.fileName = Integer.toHexString(random.nextInt(256)) + '/' + System.currentTimeMillis() + "_" + fileName
+            if(pathFormat) {
+                return PathFormat.parse(pathFormat, fileName)
+            } else {
+                Random random = new Random()
+                return this.fileName = Integer.toHexString(random.nextInt(256)) + '/' + System.currentTimeMillis() + "_" + fileName
+            }
         }
     }
 

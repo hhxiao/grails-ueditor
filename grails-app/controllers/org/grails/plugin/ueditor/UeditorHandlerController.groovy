@@ -64,6 +64,7 @@ class UeditorHandlerController {
     def upload(String xtype, String userSpace) {
         Uploader up = new Uploader()
         up.setSavePath(ueditorConfigService.getUploadFolder(xtype))
+        up.setPathFormat(ueditorConfigService.getPathFormat(xtype))
         up.upload(request, userSpace)
 
         String callback = request.getParameter("callback");

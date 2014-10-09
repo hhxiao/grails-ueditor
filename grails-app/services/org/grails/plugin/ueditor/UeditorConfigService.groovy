@@ -15,6 +15,7 @@
  */
 
 package org.grails.plugin.ueditor
+
 import grails.converters.JSON
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.springframework.beans.factory.InitializingBean
@@ -45,6 +46,10 @@ class UeditorConfigService implements InitializingBean {
         } else {
             type
         }
+    }
+
+    String getPathFormat(String type) {
+        config."${type}PathFormat"
     }
 
     String getCustomConfig() {
