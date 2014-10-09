@@ -36,29 +36,17 @@ class UeditorTagLib {
     }
  
     def config = { attrs, body ->
-        def cfg = new UeditorConfig(grailsApplication)
         def target = attrs.remove('target')
+        if (!target) throwTagError("Tag [config] is missing required attribute [target]")
+
+        def cfg = new UeditorConfig(grailsApplication)
         def var = attrs.remove('var')
         try {
             if (var) {
-                if(var == 'toolbars') {
-                    def type = attrs.value
-                    def buttonDef
-                    if(type) {
-                        buttonDef = g.message(code: "ueditor.toolbar.${type}", default: "source | undo redo | bold italic underline strikethrough | forecolor backcolor | fontsize")
-                    } else {
-                        buttonDef = body()
-                    }
-                    // convert 2 dim array
-                    def value = buttonDef.split(',').collect{it.split(' ').collect{"'${it.trim()}'"}}
-                    cfg.addConfigItem(var, value)
-                } else {
-                    def value = attrs.value ?: body()
-                    cfg.addConfigItem(var, value)
-                }
-            } else {
-                cfg.addConfigItems(attrs)
+                def value = attrs.value ?: body()
+                cfg.addConfigItem(g, var, value)
             }
+            cfg.addConfigItems(g, attrs)
         } catch (Exception e) {
             throwTagError(e.message)
         }
@@ -67,6 +55,7 @@ class UeditorTagLib {
 
     def editor = { attrs, body ->
         if (!attrs.id && !attrs.name) throwTagError("Tag [editor] is missing required attribute [id|name]")
+
         String value = attrs.value ?: body()
         def editor = ueditorConfigService.newEditor(request)
         String id = attrs.remove('id')

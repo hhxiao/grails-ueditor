@@ -91,7 +91,7 @@ class Uploader {
      */
     private String getName(String fileName, String userSpace) {
         if(userSpace) {
-            return this.fileName = userSpace + '/' + System.currentTimeMillis() + "_" + fileName
+            return this.fileName = '_' + userSpace + '/' + System.currentTimeMillis() + "_" + fileName
         } else {
             Random random = new Random()
             return this.fileName = Integer.toHexString(random.nextInt(256)) + '/' + System.currentTimeMillis() + "_" + fileName

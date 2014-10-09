@@ -28,19 +28,24 @@ class UeditorConfig {
     UeditorConfig(def grailsApplication) {
         this.grailsApplication = grailsApplication
         def cfg = grailsApplication.config
-        this.skipAllowedItemsCheck = cfg.editor?.skipAllowedItemsCheck ?: false
-        this.append = cfg.editor?.append ?: true
+        this.skipAllowedItemsCheck = cfg.ueditor?.skipAllowedItemsCheck ?: false
+        this.append = cfg.ueditor?.append ?: true
     }
 
-    def addConfigItems(def attrs) {
+    def addConfigItems(def g, def attrs) {
         attrs?.each { key, value ->
-            addConfigItem(key, value)
+            addConfigItem(g, key, value)
         }
     }
 
-    def addConfigItem(def key, def value) {
+    def addConfigItem(def g, def key, def value) {
         if(!skipAllowedItemsCheck && !ALLOWED_CONFIG_ITEMS.contains(key)) {
             throw new IllegalArgumentException("Invalid config item: $key")
+        }
+        if(key == 'toolbars') {
+            def buttonDef = g.message(code: "ueditor.toolbar.${value}".toString(), default: value)
+            // convert 2 dim array
+            value = buttonDef.split(',').collect { it.split(' ').collect { "'${it.trim()}'" } }
         }
         this.config[key] = value
     }
