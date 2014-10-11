@@ -18,6 +18,7 @@ package org.grails.plugin.ueditor
 
 import com.baidu.ueditor.hunter.FileManager
 import grails.converters.JSON
+import org.springframework.util.StringUtils
 
 class UeditorHandlerController {
     static String[] IMAGE_FILE_TYPES = [".gif" , ".png" , ".jpg" , ".jpeg" , ".bmp"] as String[];
@@ -88,7 +89,7 @@ class UeditorHandlerController {
         String rootPath = up.getPhysicalPath(request, '')
 
         Map conf = [
-            rootPath: rootPath,
+            rootPath: StringUtils.replace(rootPath, '/', File.separator),
             dir: userSpace ?: '',
             count: count ?: 20,
             allowFiles: ueditorConfigService.config."${xtype}ManagerAllowFiles" as String[]
