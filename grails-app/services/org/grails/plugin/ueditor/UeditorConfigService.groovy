@@ -99,7 +99,7 @@ class UeditorConfigService implements InitializingBean {
 
         contextPath = grailsApplication.mainContext.servletContext.contextPath
 
-        userConfig = grailsApplication.config.ueditor
+        userConfig = grailsApplication.config.grails.ueditor
 
         config = (JSONObject)JSON.parse(new ClassPathResource('/UeditorConfig.json').inputStream, StandardCharsets.UTF_8.name())
         config.entrySet().each {

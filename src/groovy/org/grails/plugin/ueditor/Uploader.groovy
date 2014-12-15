@@ -107,7 +107,7 @@ class Uploader {
      */
     public String getPhysicalPath(def request, String path) {
         File savePathFile = new File(savePath)
-        if(savePathFile.isAbsolute()) {
+        if(savePathFile.isAbsolute() || savePath.startsWith('.')) {
             if(path.startsWith(File.separator)) {
                 return savePath + path
             } else {
