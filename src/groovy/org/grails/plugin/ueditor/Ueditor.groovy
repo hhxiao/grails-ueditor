@@ -60,6 +60,11 @@ class Ueditor {
     <script type="text/javascript">
         UEDITOR.instance.${instanceId} = new UE.ui.Editor(UEDITOR.config.${instanceId} || UEDITOR.config.default);
         UEDITOR.instance.${instanceId}.render("${instanceId}");
+        \$("#$instanceId").closest('form').submit(function() {
+            if(UEDITOR.instance.${instanceId}.queryCommandState('source') == 1) {
+                UEDITOR.instance.${instanceId}.execCommand('source');
+            }
+        });
     </script>"""
         return buf.toString()
     }
