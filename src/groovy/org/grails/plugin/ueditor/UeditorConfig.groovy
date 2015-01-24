@@ -68,7 +68,7 @@ class UeditorConfig {
     def renderConfigurations(def target) {
         return """
     <script type="text/javascript">
-        ${target ? "UEDITOR.config.${target}" : "UEDITOR.config.default"} = ${getConfiguration()};
+        ${target ? "UEDITOR.config.${target}" : "UEDITOR.config.defaults"} = ${getConfiguration()};
     </script>
 """
     }

@@ -30,7 +30,7 @@ class Ueditor {
         return """
     <script type="text/javascript">
         window.UEDITOR_HOME_URL = "${homePath}/";
-        window.UEDITOR = {config:{default:{}},instance:{}};
+        window.UEDITOR = {config:{defaults:{}},instance:{}};
     </script>
     <script type="text/javascript" src="${homePath}/ueditor.config.js"></script>${customConfig(customConfigJs)}
     <script type="text/javascript" src="${homePath}/ueditor.all${minified ? '.min' : ''}.js"></script>
@@ -58,7 +58,7 @@ class Ueditor {
         }
         buf << """
     <script type="text/javascript">
-        UEDITOR.instance.${instanceId} = new UE.ui.Editor(UEDITOR.config.${instanceId} || UEDITOR.config.default);
+        UEDITOR.instance.${instanceId} = new UE.ui.Editor(UEDITOR.config.${instanceId} || UEDITOR.config.defaults);
         UEDITOR.instance.${instanceId}.render("${instanceId}");
         \$("#$instanceId").closest('form').submit(function() {
             if(UEDITOR.instance.${instanceId}.queryCommandState('source') == 1) {
